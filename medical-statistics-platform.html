@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国家健康医疗大数据研究院 - 智能数据分析平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .main-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 60px);
+        }
+        
+        .sidebar {
+            background-color: white;
+            width: 250px;
+            border-right: 1px solid #ddd;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar-left {
+            transform: translateX(-250px);
+        }
+        
+        .sidebar-right {
+            transform: translateX(250px);
+        }
+        
+        .sidebar.active {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            padding: 15px;
+            font-weight: bold;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-content {
+            padding: 15px;
+        }
+        
+        .sidebar-item {
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .sidebar-item:hover {
+            background-color: #f0f5ff;
+        }
+        
+        .sidebar-item.active {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .toggle-sidebar {
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .toggle-left {
+            top: 20px;
+            left: 20px;
+        }
+        
+        .toggle-right {
+            top: 20px;
+            right: 20px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            max-width: 80%;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        
+        .user-message {
+            background-color: #e6f7ff;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .ai-message {
+            background-color: white;
+            border: 1px solid #eee;
+        }
+        
+        .chat-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            min-height: 80px;
+            font-size: 14px;
+        }
+        
+        .input-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .primary-button {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .secondary-button {
+            background-color: #f0f0f0;
+            color: #333;
+            margin-right: 10px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        
+        .file-icon {
+            color: #1890ff;
+        }
+        
+        .folder {
+            margin-bottom: 15px;
+        }
+        
+        .folder-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">国家健康医疗大数据研究院 - 智能数据分析平台</div>
+        <div class="user-info">
+            <span>王医生</span>
+            <div class="avatar">W</div>
+        </div>
+    </header>
+    
+    <div class="main-container">
+        <!-- 左侧边栏 - 统计分析流程 -->
+        <div class="sidebar sidebar-left" id="leftSidebar">
+            <div class="sidebar-header">
+                统计分析流程
+                <span onclick="toggleSidebar('left')">&times;</span>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-item active">描述性统计分析</div>
+                <div class="sidebar-item">相关性分析</div>
+                <div class="sidebar-item">回归分析</div>
+                <div class="sidebar-item">生存分析</div>
+                <div class="sidebar-item">预测模型构建</div>
+                <div class="sidebar-item">医学图像分析</div>
+                <div class="sidebar-item">诊断标准评估</div>
+                <div class="sidebar-item">临床试验数据分析</div>
+                <div class="sidebar-item">流行病学调查分析</div>
+                <div class="sidebar-item">基因数据分析</div>
+            </div>
+        </div>
+        
+        <!-- 聊天界面 -->
+        <div class="chat-container">
+            <div class="toggle-sidebar toggle-left" onclick="toggleSidebar('left')">
+                &#9776;
+            </div>
+            <div class="toggle-sidebar toggle-right" onclick="toggleSidebar('right')">
+                &#9776;
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    您好，我是医疗数据分析助手。我可以帮您进行医学统计分析，包括描述性统计、相关性分析、回归分析等。请问您今天需要分析什么类型的医疗数据？
+                </div>
+                <div class="message user-message">
+                    我需要分析一组糖尿病患者的血糖数据和生活方式数据，看看是否有明显的相关性。
+                </div>
+                <div class="message ai-message">
+                    好的，我可以帮您进行糖尿病患者的血糖数据与生活方式的相关性分析。请您上传相关数据，或告诉我您希望如何开始这项分析？您可以从右侧文件栏中选择已有的数据集，或者我可以引导您完成一个新的分析流程。
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <textarea placeholder="输入您的问题或命令..."></textarea>
+                <div class="input-actions">
+                    <div>
+                        <button class="secondary-button">上传文件</button>
+                        <button class="secondary-button">插入数据</button>
+                    </div>
+                    <button class="primary-button">发送</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧边栏 - 项目文件 -->
+        <div class="sidebar sidebar-right" id="rightSidebar">
+            <div class="sidebar-header">
+                项目文件
+                <span onclick="toggleSidebar('right')">&times;</span>
+            </div>
+            <div class="sidebar-content">
+                <div class="folder">
+                    <div class="folder-name">数据集</div>
+                    <div class="file-item">
+                        <span class="file-icon">📊</span>
+                        <span>糖尿病患者数据.csv</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📊</span>
+                        <span>2023年患者随访记录.xlsx</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📊</span>
+                        <span>生活方式问卷调查.csv</span>
+                    </div>
+                </div>
+                
+                <div class="folder">
+                    <div class="folder-name">分析结果</div>
+                    <div class="file-item">
+                        <span class="file-icon">📄</span>
+                        <span>相关性分析报告.pdf</span>
+                    </div>
+                    <div class="file-item">
+                        <span class="file-icon">📈</span>
+                        <span>血糖趋势可视化.png</span>
+                    </div>
+                </div>
+                
+                <div class="folder">
+                    <div class="folder-name">模型文件</div>
+                    <div class="file-item">
+                        <span class="file-icon">🧠</span>
+                        <span>预测模型v1.0.pkl</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar(side) {
+            if (side === 'left') {
+                document.getElementById('leftSidebar').classList.toggle('active');
+            } else {
+                document.getElementById('rightSidebar').classList.toggle('active');
+            }
+        }
+        
+        // 初始化时打开两侧边栏
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('leftSidebar').classList.add('active');
+            document.getElementById('rightSidebar').classList.add('active');
+        });
+    </script>
+</body>
+</html>
